@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+	<meta charset="utf-8">
+	<title>芎鄉遍野</title>
+</head>
+
+<style>
+	canvas {
+		/*border: 1px solid black;*/
+		padding: 0;
+		margin: auto;
+		display: block;
+		height: 100%;
+
+		margin-top: 0%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+
+	.cssdialog {
+		/*border: 4px solid red;*/
+		/*background-color :white;*/
+		background-image:url( 'assets/talk.png' );
+		display:none;
+
+		padding: 0;
+		margin: auto;
+		display: block;
+		height: 26%;
+
+		margin-bottom: 10px;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	
+		max-width: 1000px;
+		
+		padding-left:30px;
+  		padding-right:30px; 
+		overflow:auto;
+	}
+
+	.csspage {
+		/*border: 2px solid green;*/
+		/*background-color :white;*/
+		background-image:url( 'assets/talk.png' );
+		display:none;
+
+		padding: 0;
+		margin: auto;
+		display: block;
+	
+		margin-top: 100px;
+		margin-bottom: 80px;
+			 
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		
+		width: 900px;
+		
+		
+		padding-left:30px;
+  		padding-right:30px; 
+		
+		  overflow:auto;
+		/*overflow-x:hidden;*/
+	}
+
+	 
+</style>
+
+<body onload="OnLoad()" onresize="OnResize()">
+	<canvas id="canvas" width="1024" height="768"></canvas>
+	<div class="cssdialog" id="dialog"></div>
+	<div class="csspage" id="page"> </div>
+
+	<script type=" text/javascript" src="js/jquery-1.9.0.min.js">
+		</script>
+	<script src="js/markdown.js"></script>
+	<script src="js/html_preprocessing.js"></script>
+	<script src="js/mdpp.js"></script>
+
+	<script src="js/hpcomm.js"></script>
+	<script src="js/index.js"></script>
+
+</body>
+
+</html>
