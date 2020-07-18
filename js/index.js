@@ -86,7 +86,7 @@ function LoadMap(mapid) {
 }
 
 function LoadNPC(mapid) {
-    const appNPC = "https://script.google.com/macros/s/AKfycbwizQf7mya2HaafWlX9nVC7aCROlrSB-Bt9LPJ7DepeBJ5etcb6/exec";
+    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
 
     var npc_sets = [];
     NpcRole = [];
