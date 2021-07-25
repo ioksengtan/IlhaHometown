@@ -553,8 +553,47 @@ function string2html(string_input) {
     html_output += string_input.replace(/\n/g, '<br/>');
     return html_output;
 }
-
 function parse_data(data){
+  console.log(data);
+  var npc_sets = [];
+
+  for(i=0;i<data.length;i++){
+          tmp_npc = {}
+          tmp_npc.npc_id = data[i].npc_id; 
+          tmp_npc.npc_description= data[i].npc_description; 
+          tmp_npc.type = data[i].type; 
+          tmp_npc.path = data[i].path; 
+          tmp_npc.range = data[i].range;
+          tmp_npc.path_end_x = data[i].path_end_x; 
+          tmp_npc.path_end_y = data[i].path_end_y;
+          tmp_npc.offset_x = data[i].offset_x ;
+          tmp_npc.offset_y = data[i].offset_y ;
+          tmp_npc.map_offset_x = data[i].map_offset_x; 
+          tmp_npc.map_offset_y = data[i].map_offset_y; 
+          tmp_npc.event_type = data[i].event_type; 
+          tmp_dialog_str = data[i].dialog 
+	  //console.log(tmp_dialog_str);
+          tmp_npc.dialog = {}
+          tmp_npc.dialog.raw = tmp_dialog_str.split('@rpg')
+          tmp_npc.dialog.raw.shift()
+          tmp_npc.dialog.html = [];
+          tmp_npc.dialog.type = []
+	  tmp_npc.dialog.type_argument = [];
+          tmp_dialog = {}
+          tmp_dialog.type = [];		  
+          tmp_dialog.html = [];
+          for(j=0;j<tmp_npc.dialog.raw.length;j++){
+		tmp_type_str = tmp_npc.dialog.raw[j].split('\n')[1].split(' ');				
+                tmp_npc.dialog.type.push(tmp_type_str[1]);
+		tmp_npc.dialog.type_argument.push(tmp_type_str[2]);
+                tmp_npc.dialog.html.push(md2html(tmp_npc.dialog.raw[j]))
+          }
+          npc_sets.push(tmp_npc)
+  }
+  return npc_sets
+}
+
+function parse_data_bak(data){
   var npc_sets = [];
   tmp_npc_string_set = data.split('||');
   tmp_npc_string_set.pop()

@@ -86,17 +86,26 @@ function LoadMap(mapid) {
 }
 
 function LoadNPC(mapid) {
-    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
+//    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
+    const appNPC = "https://script.google.com/macros/s/AKfycbzaWjJxhVRSA6e_RTCt8OnHuy8MCueG-uAZ4TYvwzj7_PHuXkQ/exec";
 
     var npc_sets = [];
     NpcRole = [];
 
 
     $.get(appNPC, {
+        "url": "https://docs.google.com/spreadsheets/d/1M9ES5yUzWgVrNOIYT2fHTCP1M3JlHBA1I1PLmnEcndI/edit#gid=0",
+        "name": "Resources",  
         "map_id": mapid,
         "command": "GetNPCsFromMapID"
     }, function (data) {
-        npc_sets = parse_data(data);    //console.log(npc_sets.length);
+	//console.log(data);
+	var tmp = JSON.parse(data);
+	//console.log(tmp);
+        //npc_sets = parse_data(data);    //console.log(npc_sets.length);
+	npc_sets = parse_data(tmp.table);
+	//npc_sets = tmp.table;
+	console.log(npc_sets);
 
         for (var i = 0; i < npc_sets.length; i++) {
 
