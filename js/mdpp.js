@@ -553,7 +553,9 @@ function string2html(string_input) {
     html_output += string_input.replace(/\n/g, '<br/>');
     return html_output;
 }
+
 function parse_data(data){
+    
   console.log(data);
   var npc_sets = [];
 
@@ -592,6 +594,48 @@ function parse_data(data){
   }
   return npc_sets
 }
+
+function parse_data_new(data){
+    
+    console.log(data);
+    var npc_sets = [];
+  //['map_id', 'npc_id', 'npc_description', 'type', 'path', 'range', 'path_end_x', 'path_end_y', 
+  //'offset_x', 'offset_y', 'map_offset_x(max:64)', 'map_offset_y(max: 48)', 'event_type( 0: no action; 1: show dialog/page)', 'dialog', 'DELETE', 'StoryID']
+    for(i=1;i<data.length;i++){
+            tmp_npc = {}
+            tmp_npc.npc_id = data[i][1]; 
+            tmp_npc.npc_description= [2]; 
+            tmp_npc.type = data[i][3]; 
+            tmp_npc.path = data[i][4]; 
+            tmp_npc.range = data[i][5];
+            tmp_npc.path_end_x = data[i][6]; 
+            tmp_npc.path_end_y = data[i][7];
+            tmp_npc.offset_x = data[i][8] ;
+            tmp_npc.offset_y = data[i][9] ;
+            tmp_npc.map_offset_x = data[i][10]; 
+            tmp_npc.map_offset_y = data[i][11]; 
+            tmp_npc.event_type = data[i][12]; 
+            tmp_dialog_str = data[i][13] 
+        //console.log(tmp_dialog_str);
+            tmp_npc.dialog = {}
+            tmp_npc.dialog.raw = tmp_dialog_str.split('@rpg')
+            tmp_npc.dialog.raw.shift()
+            tmp_npc.dialog.html = [];
+            tmp_npc.dialog.type = []
+        tmp_npc.dialog.type_argument = [];
+            tmp_dialog = {}
+            tmp_dialog.type = [];		  
+            tmp_dialog.html = [];
+            for(j=0;j<tmp_npc.dialog.raw.length;j++){
+          tmp_type_str = tmp_npc.dialog.raw[j].split('\n')[1].split(' ');				
+                  tmp_npc.dialog.type.push(tmp_type_str[1]);
+          tmp_npc.dialog.type_argument.push(tmp_type_str[2]);
+                  tmp_npc.dialog.html.push(md2html(tmp_npc.dialog.raw[j]))
+            }
+            npc_sets.push(tmp_npc)
+    }
+    return npc_sets
+  }
 
 function parse_data_bak(data){
   var npc_sets = [];

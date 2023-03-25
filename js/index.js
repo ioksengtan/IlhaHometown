@@ -87,23 +87,23 @@ function LoadMap(mapid) {
 
 function LoadNPC(mapid) {
 //    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
-    const appNPC = "https://script.google.com/macros/s/AKfycbzaWjJxhVRSA6e_RTCt8OnHuy8MCueG-uAZ4TYvwzj7_PHuXkQ/exec";
+    const appNPC = "https://script.google.com/macros/s/AKfycby6KZPk61RAe2e7FwJ0Kb_MDVybRyzfJTI0bE5bNvMHFkvbGEAlGwVaZQYYoGoD4zqP/exec";
 
     var npc_sets = [];
     NpcRole = [];
 
 
     $.get(appNPC, {
-        "url": "https://docs.google.com/spreadsheets/d/1M9ES5yUzWgVrNOIYT2fHTCP1M3JlHBA1I1PLmnEcndI/edit#gid=0",
+        "url": "https://docs.google.com/spreadsheets/d/1SyVO7OwOGEy3gyIX2kP4BAxDZRaVVfTeWul2LXIJcOU/edit#gid=947896803",
         "name": "Resources",  
         "map_id": mapid,
         "command": "GetNPCsFromMapID"
     }, function (data) {
-	//console.log(data);
-	var tmp = JSON.parse(data);
+	console.log(data);
+	tmp = JSON.parse(data);
 	//console.log(tmp);
         //npc_sets = parse_data(data);    //console.log(npc_sets.length);
-	npc_sets = parse_data(tmp.table);
+	npc_sets = parse_data_new(tmp);
 	//npc_sets = tmp.table;
 	console.log(npc_sets);
 
