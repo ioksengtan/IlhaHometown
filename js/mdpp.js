@@ -7,7 +7,7 @@ function DynamicDisplay(mdppSet, DivSet, id) {
             case "ls":
                 {
 
-                    $.get(appResources,
+                    $.get(appResources, 
 
                         {
                             "command": "commandGetSpecificTypeResources",
