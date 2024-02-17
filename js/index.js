@@ -87,7 +87,8 @@ function LoadMap(mapid) {
 
 function LoadNPC(mapid) {
 //    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
-    const appNPC = "https://script.google.com/macros/s/AKfycby6KZPk61RAe2e7FwJ0Kb_MDVybRyzfJTI0bE5bNvMHFkvbGEAlGwVaZQYYoGoD4zqP/exec";
+    //const appNPC = "https://script.google.com/macros/s/AKfycby6KZPk61RAe2e7FwJ0Kb_MDVybRyzfJTI0bE5bNvMHFkvbGEAlGwVaZQYYoGoD4zqP/exec";
+	const appNPC = "https://script.google.com/macros/s/AKfycbwx3nI_8tFQmh9EXUhelzGJFeXrgCNX6CVUY3nDqzp_hevRq86UE8uXmbhHfqqAt3AP/exec";
 
     var npc_sets = [];
     NpcRole = [];
@@ -182,7 +183,7 @@ function RoleFrame(role) {
     }
 }
 
-function PickNPC() {
+function get_selected_npc_id() { //get_selected_npc_id
     //console.log("mx" + g_mx + " my" + g_my);
     if (m_screen == SCREEN_GAME) {
 
@@ -305,7 +306,7 @@ function onMouseDown(e) {
     if (m_screen == SCREEN_DIALOG) { DialogClick(); return; }
     if (m_screen == SCREEN_PAGE) { DialogClick(); return; }
     if (m_screen == SCREEN_GAME) {
-        m_pickRole = PickNPC();
+        m_pickRole = get_selected_npc_id();
         if (m_pickRole >= 0) {
             console.log("pick=" + m_pickRole); console.log(NpcRole[m_pickRole].dialog);
 
@@ -323,7 +324,11 @@ function onMouseDown(e) {
     }
 }
 
-function DialogClick() { if (m_screen == SCREEN_DIALOG || SCREEN_PAGE) { DialogCmd(); } }
+function DialogClick() { 
+	if (m_screen == SCREEN_DIALOG || SCREEN_PAGE) { 
+		DialogCmd(); 
+	} 
+}
 
 function onMouseUp(e) {
     if (e.button != 0) return; //左鍵
@@ -354,8 +359,13 @@ function game_Render() {
 
         case SCREEN_GAME:
             MapScroll();
-            for (var i = 0; i < NpcRole.length; i++) { RoleMove(NpcRole[i]); RoleFrame(NpcRole[i]); DrawNpc(NpcRole[i]); }
-            RoleFrame(Player); DrawPlayer(Player);
+            for (var i = 0; i < NpcRole.length; i++) { 
+				RoleMove(NpcRole[i]); 
+				RoleFrame(NpcRole[i]); 
+				DrawNpc(NpcRole[i]); 
+			}
+			RoleFrame(Player); 
+			DrawPlayer(Player);
             break;
     }
 }
