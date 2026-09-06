@@ -139,6 +139,8 @@ function applyNpcSets(npc_sets) {
         NpcRole[i].path = npc_sets[i].path;
         NpcRole[i].type = npc_sets[i].type;
         NpcRole[i].event_type = npc_sets[i].event_type;
+        NpcRole[i].draw = npc_sets[i].draw !== false;
+        NpcRole[i].id = npc_sets[i].id;
 
         NpcRole[i].dir = 0;
         NpcRole[i].frame = 0;//第幾張
@@ -168,6 +170,7 @@ function normalizeLocalNpcData(data) {
         }
         return data;
     }
+    if (data.exhibits) return data.exhibits;
     if (data.npcs) {
         if (data.npcs.length > 0 && Object.prototype.toString.call(data.npcs[0]) === "[object Array]") {
             return parse_data_new(data.npcs);
@@ -208,12 +211,27 @@ function loadNpcFromAppsScript(mapid) {
         .fail(function () { markNpcLoaded(); });
 }
 
+function localNpcUrls(mapid) {
+    return [
+        "data/map_" + mapid + "_exhibits.json",
+        "data/map_" + mapid + ".json"
+    ];
+}
+
 function LoadNPC(mapid) {
     NpcRole = [];
+    tryLocalNpc(mapid, 0);
+}
 
-    // Prefer in-repo JSON (data/map_<id>.json) so maps like 13 do not depend on Apps Script.
+function tryLocalNpc(mapid, idx) {
+    var urls = localNpcUrls(mapid);
+    if (idx >= urls.length) {
+        loadNpcFromAppsScript(mapid);
+        return;
+    }
+    // Prefer in-repo JSON so maps like 13 do not depend on Apps Script.
     $.ajax({
-        url: "data/map_" + mapid + ".json",
+        url: urls[idx],
         dataType: "json"
     }).done(function (data) {
         var npc_sets = normalizeLocalNpcData(data);
@@ -221,7 +239,7 @@ function LoadNPC(mapid) {
         applyNpcSets(npc_sets);
         markNpcLoaded();
     }).fail(function () {
-        loadNpcFromAppsScript(mapid);
+        tryLocalNpc(mapid, idx + 1);
     });
 }
 
@@ -270,6 +288,7 @@ function DrawPlayer(npc) {
 }
 
 function DrawNpc(npc) {
+    if (npc.draw === false) return;
     //建築物
     if (npc.type == 'static') {
         Bitblt(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, npc.srcx - VirualScreen.srcx, npc.srcy - VirualScreen.srcy);

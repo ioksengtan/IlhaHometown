@@ -1,0 +1,124 @@
+{
+  "map_id": 13,
+  "notes": "Studio hub exhibits (PM v2). map_offset is hitbox top-left tile; path_end is width×height in tiles. Floor art is expected to already show the five frames; draw=false keeps static_* from stacking on top. href remains #TBD. Island → studio entrance is out of scope.",
+  "exhibits": [
+    {
+      "id": "exit_to_island",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "門口｜回芎林島",
+      "action": "map",
+      "map_offset_x": 30,
+      "map_offset_y": 38,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 3,
+      "path_end_y": 3,
+      "range": 0,
+      "path": "",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["1"],
+        "html": [""]
+      }
+    },
+    {
+      "id": "work_liuliu",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "展品｜溜溜紀念繪本",
+      "action": "link",
+      "map_offset_x": 13,
+      "map_offset_y": 10,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 4,
+      "path_end_y": 3,
+      "range": 0,
+      "path": "",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<p>溜溜紀念繪本</p><p><a href=\"#TBD\" target=\"_blank\" rel=\"noopener\">打開作品</a></p>"
+        ]
+      }
+    },
+    {
+      "id": "work_celebrities",
+      "npc_id": 3,
+      "type": "static",
+      "npc_description": "展品｜Celebrities",
+      "action": "link",
+      "map_offset_x": 46,
+      "map_offset_y": 10,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 4,
+      "path_end_y": 3,
+      "range": 0,
+      "path": "",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<p>Celebrities</p><p><a href=\"#TBD\" target=\"_blank\" rel=\"noopener\">打開作品</a></p>"
+        ]
+      }
+    },
+    {
+      "id": "work_listmap",
+      "npc_id": 4,
+      "type": "static",
+      "npc_description": "展品｜Listmap",
+      "action": "link",
+      "map_offset_x": 14,
+      "map_offset_y": 27,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 3,
+      "path_end_y": 3,
+      "range": 0,
+      "path": "",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<p>Listmap</p><p><a href=\"#TBD\" target=\"_blank\" rel=\"noopener\">打開作品</a></p>"
+        ]
+      }
+    },
+    {
+      "id": "work_minigames",
+      "npc_id": 5,
+      "type": "static",
+      "npc_description": "展品｜小遊戲入口",
+      "action": "link",
+      "map_offset_x": 47,
+      "map_offset_y": 27,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 3,
+      "path_end_y": 3,
+      "range": 0,
+      "path": "",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<p>小遊戲</p><p><a href=\"#TBD\" target=\"_blank\" rel=\"noopener\">開始玩</a></p>"
+        ]
+      }
+    }
+  ]
+}
