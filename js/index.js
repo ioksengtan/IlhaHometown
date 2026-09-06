@@ -186,30 +186,11 @@ function markNpcLoaded() {
     tryFinishLoading();
 }
 
-function loadNpcFromAppsScript(mapid) {
-//    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
-    //const appNPC = "https://script.google.com/macros/s/AKfycby6KZPk61RAe2e7FwJ0Kb_MDVybRyzfJTI0bE5bNvMHFkvbGEAlGwVaZQYYoGoD4zqP/exec";
-	const appNPC = "https://script.google.com/macros/s/AKfycbwx3nI_8tFQmh9EXUhelzGJFeXrgCNX6CVUY3nDqzp_hevRq86UE8uXmbhHfqqAt3AP/exec";
-
-    $.get(appNPC, {
-        "url": "https://docs.google.com/spreadsheets/d/1SyVO7OwOGEy3gyIX2kP4BAxDZRaVVfTeWul2LXIJcOU/edit#gid=947896803",
-        "name": "Resources",
-        "map_id": mapid,
-        "command": "GetNPCsFromMapID"
-    }, function (data) {
-	console.log(data);
-	tmp = JSON.parse(data);
-	//console.log(tmp);
-        //npc_sets = parse_data(data);    //console.log(npc_sets.length);
-	var npc_sets = parse_data_new(tmp);
-	//npc_sets = tmp.table;
-	console.log(npc_sets);
-        applyNpcSets(npc_sets);
-    })
-        //載入完成（失敗時仍進入地圖，避免 Access Denied 卡在 Loading）
-        .done(function () { markNpcLoaded(); })
-        .fail(function () { markNpcLoaded(); });
-}
+// Dead: former Apps Script + Sheets NPC pipeline (cut from the main line).
+// Live LoadNPC never calls script.google.com. Historical endpoint (Access Denied):
+// https://script.google.com/macros/s/AKfycbwx3nI_8tFQmh9EXUhelzGJFeXrgCNX6CVUY3nDqzp_hevRq86UE8uXmbhHfqqAt3AP/exec
+// ?url=https://docs.google.com/spreadsheets/d/1SyVO7OwOGEy3gyIX2kP4BAxDZRaVVfTeWul2LXIJcOU/edit#gid=947896803
+// &name=Resources&command=GetNPCsFromMapID&map_id=<id>
 
 function localNpcUrls(mapid) {
     return [
@@ -226,10 +207,11 @@ function LoadNPC(mapid) {
 function tryLocalNpc(mapid, idx) {
     var urls = localNpcUrls(mapid);
     if (idx >= urls.length) {
-        loadNpcFromAppsScript(mapid);
+        console.log("LoadNPC: no local JSON for map " + mapid + "; entering GAME with empty NPCs");
+        applyNpcSets([]);
+        markNpcLoaded();
         return;
     }
-    // Prefer in-repo JSON so maps like 13 do not depend on Apps Script.
     $.ajax({
         url: urls[idx],
         dataType: "json"
