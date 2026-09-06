@@ -88,6 +88,7 @@ function fitPlayfield() {
 
     c.style.width = Math.floor(dw) + "px";
     c.style.height = Math.floor(dh) + "px";
+    // CSS uses top/left 50% + translate(-50%,-50%) to keep the box centered.
 }
 
 function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }
