@@ -15,6 +15,9 @@ var m_screen = SCREEN_LOAD;
 var Player = { srcx: 0, srcy: 0, destx: 0, desty: 0, img: null, dir: 0, frame: 0, frametime: 0 };
 var NpcRole = [];
 var VirualScreen = { srcx: 0, srcy: 0 };
+var g_mapid = 1;
+const STUDIO_MAP_ID = 13;
+const STUDIO_PLAYER_SCALE = 2;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,12 +84,42 @@ function tryFinishLoading() {
     if (g_map_image_ok && g_npc_data_ok) g_loading_ok = true;
 }
 
+function isStudioMap() { return g_mapid === STUDIO_MAP_ID; }
+
+function clampStudioCamera() {
+    if (!isStudioMap() || !imgMap) return;
+    var maxx = Math.max(0, imgMap.width - Screen_w);
+    var maxy = Math.max(0, imgMap.height - Screen_h);
+    if (VirualScreen.srcx < 0) VirualScreen.srcx = 0;
+    if (VirualScreen.srcy < 0) VirualScreen.srcy = 0;
+    if (VirualScreen.srcx > maxx) VirualScreen.srcx = maxx;
+    if (VirualScreen.srcy > maxy) VirualScreen.srcy = maxy;
+}
+
+function clampStudioPlayerPos() {
+    if (!isStudioMap() || !imgMap) return;
+    var minx = 24;
+    var miny = 0;
+    var maxx = Math.max(minx, imgMap.width - 48);
+    var maxy = Math.max(miny, imgMap.height - 48);
+    if (Player.srcx < minx) Player.srcx = minx;
+    if (Player.srcy < miny) Player.srcy = miny;
+    if (Player.srcx > maxx) Player.srcx = maxx;
+    if (Player.srcy > maxy) Player.srcy = maxy;
+}
+
+function playerDrawScale(role) {
+    if (role === Player && isStudioMap()) return STUDIO_PLAYER_SCALE;
+    return 1;
+}
+
 function LoadMap(mapid) {
 
     m_screen = SCREEN_LOAD;
     g_loading_ok = false;
     g_map_image_ok = false;
     g_npc_data_ok = false;
+    g_mapid = Number(mapid);
 
     ShowDialog(false);
     ShowPage(false);
@@ -103,6 +136,7 @@ function LoadMap(mapid) {
 
         VirualScreen.srcx = Player.srcx - Screen_w / 2;
         VirualScreen.srcy = Player.srcy - Screen_h / 2;
+        clampStudioCamera();
 
         g_map_image_ok = true;
         tryFinishLoading();
@@ -260,7 +294,16 @@ function get_selected_npc_id() { //get_selected_npc_id
 
 function DrawPlayer(npc) {
     var gy = npc.dir * 48;
-    Bitblt(npc.img, npc.frame * 48, gy, 48, 48, npc.srcx - VirualScreen.srcx, npc.srcy - VirualScreen.srcy);
+    var scale = playerDrawScale(npc);
+    var dx = npc.srcx - VirualScreen.srcx;
+    var dy = npc.srcy - VirualScreen.srcy;
+    if (scale === 1) {
+        Bitblt(npc.img, npc.frame * 48, gy, 48, 48, dx, dy);
+        return;
+    }
+    var dw = 48 * scale;
+    var dh = 48 * scale;
+    BitbltScale(npc.img, npc.frame * 48, gy, 48, 48, dx - (dw - 48) / 2, dy - (dh - 48), dw, dh);
 }
 
 function DrawNpc(npc) {
@@ -354,9 +397,11 @@ function MapScroll() {
 
     if (Player.srcx < 24) Player.srcx = 24;
     if (Player.srcy < 0) Player.srcy = 0;
+    clampStudioPlayerPos();
 
     VirualScreen.srcx = Player.srcx - Screen_w / 2;
     VirualScreen.srcy = Player.srcy - Screen_h / 2;
+    clampStudioCamera();
 
     context.fillStyle = 'rgb(0,0,0)'; context.fillRect(0, 0, canvas.width, canvas.height);
     Bitblt(imgMap, VirualScreen.srcx, VirualScreen.srcy, Screen_w, Screen_h, 0, 0);

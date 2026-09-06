@@ -37,6 +37,7 @@ function fullscreen() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function BitRow(img, row, w, h, dstx, dsty) { context.drawImage(img, row * w, 0, w, h, dstx, dsty, w, h); }
 function Bitblt(img, srcx, srcy, w, h, dstx, dsty) { context.drawImage(img, srcx, srcy, w, h, dstx, dsty, w, h); }
+function BitbltScale(img, srcx, srcy, w, h, dstx, dsty, dw, dh) { context.drawImage(img, srcx, srcy, w, h, dstx, dsty, dw, dh); }
 function Bit(img, dstx, dsty) { context.drawImage(img, dstx, dsty); }
 function BitBkg(img) { context.drawImage(img, 0, 0); }
 function BitColor() {  context.fillStyle = 'rgb(0,0,0)'; context.fillRect(0, 0, canvas.width, canvas.height); }
