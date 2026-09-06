@@ -15,6 +15,10 @@ var m_screen = SCREEN_LOAD;
 var Player = { srcx: 0, srcy: 0, destx: 0, desty: 0, img: null, dir: 0, frame: 0, frametime: 0 };
 var NpcRole = [];
 var VirualScreen = { srcx: 0, srcy: 0 };
+var g_mapid = 1;
+const STUDIO_MAP_ID = 13;
+const STUDIO_PLAYER_SCALE = 3;
+const STUDIO_VIEW_ZOOM = 1.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,12 +85,68 @@ function tryFinishLoading() {
     if (g_map_image_ok && g_npc_data_ok) g_loading_ok = true;
 }
 
+function isStudioMap() { return g_mapid === STUDIO_MAP_ID; }
+
+function studioZoom() { return isStudioMap() ? STUDIO_VIEW_ZOOM : 1; }
+
+function studioViewW() { return Screen_w / studioZoom(); }
+
+function studioViewH() { return Screen_h / studioZoom(); }
+
+function worldToScreenX(wx) { return (wx - VirualScreen.srcx) * studioZoom(); }
+
+function worldToScreenY(wy) { return (wy - VirualScreen.srcy) * studioZoom(); }
+
+function clampStudioCamera() {
+    if (!isStudioMap() || !imgMap) return;
+    var maxx = Math.max(0, imgMap.width - studioViewW());
+    var maxy = Math.max(0, imgMap.height - studioViewH());
+    if (VirualScreen.srcx < 0) VirualScreen.srcx = 0;
+    if (VirualScreen.srcy < 0) VirualScreen.srcy = 0;
+    if (VirualScreen.srcx > maxx) VirualScreen.srcx = maxx;
+    if (VirualScreen.srcy > maxy) VirualScreen.srcy = maxy;
+}
+
+function studioPlayerBounds() {
+    var extra = 48 * STUDIO_PLAYER_SCALE - 48;
+    var minx = extra / 2;
+    var miny = extra;
+    return {
+        minx: minx,
+        miny: miny,
+        maxx: Math.max(minx, imgMap.width - 48 - extra / 2),
+        maxy: Math.max(miny, imgMap.height - 48)
+    };
+}
+
+function clampStudioPlayerXY(x, y) {
+    var b = studioPlayerBounds();
+    if (x < b.minx) x = b.minx;
+    if (y < b.miny) y = b.miny;
+    if (x > b.maxx) x = b.maxx;
+    if (y > b.maxy) y = b.maxy;
+    return { x: x, y: y };
+}
+
+function clampStudioPlayerPos() {
+    if (!isStudioMap() || !imgMap) return;
+    var p = clampStudioPlayerXY(Player.srcx, Player.srcy);
+    Player.srcx = p.x;
+    Player.srcy = p.y;
+}
+
+function playerDrawScale(role) {
+    if (role === Player && isStudioMap()) return STUDIO_PLAYER_SCALE;
+    return 1;
+}
+
 function LoadMap(mapid) {
 
     m_screen = SCREEN_LOAD;
     g_loading_ok = false;
     g_map_image_ok = false;
     g_npc_data_ok = false;
+    g_mapid = Number(mapid);
 
     ShowDialog(false);
     ShowPage(false);
@@ -101,8 +161,9 @@ function LoadMap(mapid) {
         Player.destx = Player.srcx;
         Player.desty = Player.srcy;
 
-        VirualScreen.srcx = Player.srcx - Screen_w / 2;
-        VirualScreen.srcy = Player.srcy - Screen_h / 2;
+        VirualScreen.srcx = Player.srcx - studioViewW() / 2;
+        VirualScreen.srcy = Player.srcy - studioViewH() / 2;
+        clampStudioCamera();
 
         g_map_image_ok = true;
         tryFinishLoading();
@@ -248,11 +309,12 @@ function get_selected_npc_id() { //get_selected_npc_id
     //console.log("mx" + g_mx + " my" + g_my);
     if (m_screen == SCREEN_GAME) {
 
+        var z = studioZoom();
         for (var i = 0; i < NpcRole.length; i++) {
-            var x = NpcRole[i].srcx - VirualScreen.srcx;
-            var y = NpcRole[i].srcy - VirualScreen.srcy;
-            if (NpcRole[i].type == 'static' && MouseInRcWH(x, y, NpcRole[i].build_w, NpcRole[i].build_h)) return i;
-            if (NpcRole[i].type == 'dynamic' && MouseInRcWH(x, y, 48, 48)) return i;
+            var x = worldToScreenX(NpcRole[i].srcx);
+            var y = worldToScreenY(NpcRole[i].srcy);
+            if (NpcRole[i].type == 'static' && MouseInRcWH(x, y, NpcRole[i].build_w * z, NpcRole[i].build_h * z)) return i;
+            if (NpcRole[i].type == 'dynamic' && MouseInRcWH(x, y, 48 * z, 48 * z)) return i;
         }
     }
     return -1;
@@ -260,14 +322,32 @@ function get_selected_npc_id() { //get_selected_npc_id
 
 function DrawPlayer(npc) {
     var gy = npc.dir * 48;
-    Bitblt(npc.img, npc.frame * 48, gy, 48, 48, npc.srcx - VirualScreen.srcx, npc.srcy - VirualScreen.srcy);
+    var scale = playerDrawScale(npc);
+    var z = studioZoom();
+    var dx = worldToScreenX(npc.srcx);
+    var dy = worldToScreenY(npc.srcy);
+    if (scale === 1 && z === 1) {
+        Bitblt(npc.img, npc.frame * 48, gy, 48, 48, dx, dy);
+        return;
+    }
+    var cell = 48 * z;
+    var dw = 48 * scale * z;
+    var dh = 48 * scale * z;
+    var smooth = context.imageSmoothingEnabled;
+    context.imageSmoothingEnabled = false;
+    BitbltScale(npc.img, npc.frame * 48, gy, 48, 48, dx - (dw - cell) / 2, dy - (dh - cell), dw, dh);
+    context.imageSmoothingEnabled = smooth;
 }
 
 function DrawNpc(npc) {
     if (npc.draw === false) return;
     //建築物
     if (npc.type == 'static') {
-        Bitblt(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, npc.srcx - VirualScreen.srcx, npc.srcy - VirualScreen.srcy);
+        var z = studioZoom();
+        var dx = worldToScreenX(npc.srcx);
+        var dy = worldToScreenY(npc.srcy);
+        if (z === 1) Bitblt(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, dx, dy);
+        else BitbltScale(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, dx, dy, npc.build_w * z, npc.build_h * z);
     }
     //人物
     else if (npc.type == 'dynamic') { DrawPlayer(npc); }
@@ -354,12 +434,17 @@ function MapScroll() {
 
     if (Player.srcx < 24) Player.srcx = 24;
     if (Player.srcy < 0) Player.srcy = 0;
+    clampStudioPlayerPos();
 
-    VirualScreen.srcx = Player.srcx - Screen_w / 2;
-    VirualScreen.srcy = Player.srcy - Screen_h / 2;
+    var vw = studioViewW();
+    var vh = studioViewH();
+    VirualScreen.srcx = Player.srcx - vw / 2;
+    VirualScreen.srcy = Player.srcy - vh / 2;
+    clampStudioCamera();
 
     context.fillStyle = 'rgb(0,0,0)'; context.fillRect(0, 0, canvas.width, canvas.height);
-    Bitblt(imgMap, VirualScreen.srcx, VirualScreen.srcy, Screen_w, Screen_h, 0, 0);
+    if (studioZoom() === 1) Bitblt(imgMap, VirualScreen.srcx, VirualScreen.srcy, Screen_w, Screen_h, 0, 0);
+    else BitbltScale(imgMap, VirualScreen.srcx, VirualScreen.srcy, vw, vh, 0, 0, Screen_w, Screen_h);
 }
 
 function onMouseDown(e) {
@@ -376,13 +461,19 @@ function onMouseDown(e) {
             return;
         }
 
-        Player.destx = VirualScreen.srcx + g_mx;
-        Player.desty = VirualScreen.srcy + g_my;
+        var z = studioZoom();
+        Player.destx = VirualScreen.srcx + g_mx / z;
+        Player.desty = VirualScreen.srcy + g_my / z;
 
         if (Player.destx < 0) Player.destx = 0;
         if (Player.desty < 0) Player.desty = 0;
         if (Player.destx > imgMap.width - 48) Player.destx = imgMap.width - 48;
         if (Player.desty > imgMap.height - 48) Player.desty = imgMap.height - 48;
+        if (isStudioMap() && imgMap) {
+            var dest = clampStudioPlayerXY(Player.destx, Player.desty);
+            Player.destx = dest.x;
+            Player.desty = dest.y;
+        }
     }
 }
 
