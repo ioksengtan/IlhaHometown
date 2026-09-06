@@ -18,7 +18,7 @@ var VirualScreen = { srcx: 0, srcy: 0 };
 var g_mapid = 1;
 const STUDIO_MAP_ID = 13;
 const STUDIO_PLAYER_SCALE = 3;
-const STUDIO_VIEW_ZOOM = 2;
+const STUDIO_VIEW_ZOOM = 1.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
