@@ -32,7 +32,7 @@ function OnLoad() {
     canvas.addEventListener("mousedown", onMouseDown, false);
     canvas.addEventListener("mouseup", onMouseUp, false);
 
-    LoadMap(1);
+    LoadMap(getBootMapId());
 
     var oDiv = document.getElementById('dialog');
     oDiv.addEventListener("click", DialogClick, false);
@@ -51,18 +51,42 @@ function OnResize() {
     div = document.getElementById('page'); div.style.width = canvas.scrollWidth * 0.8 + "px";
 }
 
-function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; }
+function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }
 function ShowDialog(bs) { var x = document.getElementById('dialog'); if (bs == true) x.style.display = "block"; if (bs == false) x.style.display = "none"; }
 
-function InsertPage(params) { var div = document.getElementById('page'); div.scrollTop = 0; div.innerHTML = params; }
+function InsertPage(params) { var div = document.getElementById('page'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }
 function ShowPage(bs) { var x = document.getElementById('page'); if (bs == true) x.style.display = "block"; if (bs == false) x.style.display = "none"; }
 
+function bindExternalDialogLinks(container) {
+    var links = container.getElementsByTagName("a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", function (e) { e.stopPropagation(); }, false);
+    }
+}
+
+function getBootMapId() {
+    try {
+        var params = new URLSearchParams(window.location.search);
+        var m = params.get("map");
+        if (m !== null && /^\d+$/.test(m)) return Number(m);
+    } catch (e) { }
+    return 1;
+}
+
 var g_loading_ok = false;
+var g_map_image_ok = false;
+var g_npc_data_ok = false;
+
+function tryFinishLoading() {
+    if (g_map_image_ok && g_npc_data_ok) g_loading_ok = true;
+}
 
 function LoadMap(mapid) {
 
     m_screen = SCREEN_LOAD;
     g_loading_ok = false;
+    g_map_image_ok = false;
+    g_npc_data_ok = false;
 
     ShowDialog(false);
     ShowPage(false);
@@ -80,82 +104,119 @@ function LoadMap(mapid) {
         VirualScreen.srcx = Player.srcx - Screen_w / 2;
         VirualScreen.srcy = Player.srcy - Screen_h / 2;
 
+        g_map_image_ok = true;
+        tryFinishLoading();
+
     }; imgMap.src = "assets/map_" + mapid + ".jpg";
 
     LoadNPC(mapid);
 }
 
-function LoadNPC(mapid) {
-//    const appNPC = "https://script.google.com/macros/s/AKfycbzLOZy5MDDT1mOx51HVFocQUaeLJJCqtT5fjj07bCPrGj2vFRIR/exec";
-    //const appNPC = "https://script.google.com/macros/s/AKfycby6KZPk61RAe2e7FwJ0Kb_MDVybRyzfJTI0bE5bNvMHFkvbGEAlGwVaZQYYoGoD4zqP/exec";
-	const appNPC = "https://script.google.com/macros/s/AKfycbwx3nI_8tFQmh9EXUhelzGJFeXrgCNX6CVUY3nDqzp_hevRq86UE8uXmbhHfqqAt3AP/exec";
-
-    var npc_sets = [];
+function applyNpcSets(npc_sets) {
     NpcRole = [];
+    if (!npc_sets) return;
 
+    for (var i = 0; i < npc_sets.length; i++) {
 
-    $.get(appNPC, {
-        "url": "https://docs.google.com/spreadsheets/d/1SyVO7OwOGEy3gyIX2kP4BAxDZRaVVfTeWul2LXIJcOU/edit#gid=947896803",
-        "name": "Resources",  
-        "map_id": mapid,
-        "command": "GetNPCsFromMapID"
-    }, function (data) {
-	console.log(data);
-	tmp = JSON.parse(data);
-	//console.log(tmp);
-        //npc_sets = parse_data(data);    //console.log(npc_sets.length);
-	npc_sets = parse_data_new(tmp);
-	//npc_sets = tmp.table;
-	console.log(npc_sets);
+        NpcRole[i] = new Array();
 
-        for (var i = 0; i < npc_sets.length; i++) {
+        NpcRole[i].dialog = npc_sets[i].dialog;
+        NpcRole[i].npc_description = npc_sets[i].npc_description;
+        NpcRole[i].range = Number(npc_sets[i].range) * 48;
+        NpcRole[i].map_offset_x = Number(npc_sets[i].map_offset_x) * 48;
+        NpcRole[i].map_offset_y = Number(npc_sets[i].map_offset_y) * 48;
+        //建築物
+        NpcRole[i].build_offx = Number(npc_sets[i].offset_x) * 48;
+        NpcRole[i].build_offy = Number(npc_sets[i].offset_y) * 48;
+        NpcRole[i].build_w = Number(npc_sets[i].path_end_x) * 48;
+        NpcRole[i].build_h = Number(npc_sets[i].path_end_y) * 48;
 
-            NpcRole[i] = new Array();
+        //人物來回移動的另一點
+        NpcRole[i].path_end_x = Number(npc_sets[i].path_end_x) * 48;
+        NpcRole[i].path_end_y = Number(npc_sets[i].path_end_y) * 48;
 
-            NpcRole[i].dialog = npc_sets[i].dialog;
-            NpcRole[i].npc_description = npc_sets[i].npc_description;
-            NpcRole[i].range = Number(npc_sets[i].range) * 48;
-            NpcRole[i].map_offset_x = Number(npc_sets[i].map_offset_x) * 48;
-            NpcRole[i].map_offset_y = Number(npc_sets[i].map_offset_y) * 48;
-            //建築物
-            NpcRole[i].build_offx = Number(npc_sets[i].offset_x) * 48;
-            NpcRole[i].build_offy = Number(npc_sets[i].offset_y) * 48;
-            NpcRole[i].build_w = Number(npc_sets[i].path_end_x) * 48;
-            NpcRole[i].build_h = Number(npc_sets[i].path_end_y) * 48;
+        //字串
+        NpcRole[i].path = npc_sets[i].path;
+        NpcRole[i].type = npc_sets[i].type;
+        NpcRole[i].event_type = npc_sets[i].event_type;
+        NpcRole[i].draw = npc_sets[i].draw !== false;
+        NpcRole[i].id = npc_sets[i].id;
 
-            //人物來回移動的另一點
-            NpcRole[i].path_end_x = Number(npc_sets[i].path_end_x) * 48;
-            NpcRole[i].path_end_y = Number(npc_sets[i].path_end_y) * 48;
+        NpcRole[i].dir = 0;
+        NpcRole[i].frame = 0;//第幾張
+        NpcRole[i].frametime = 0;
+        //螢幕上地圖位置
+        NpcRole[i].srcx = Number(npc_sets[i].map_offset_x) * 48;
+        NpcRole[i].srcy = Number(npc_sets[i].map_offset_y) * 48;
 
-            //字串
-            NpcRole[i].path = npc_sets[i].path;
-            NpcRole[i].type = npc_sets[i].type;
-            NpcRole[i].event_type = npc_sets[i].event_type;
-
-            NpcRole[i].dir = 0;
-            NpcRole[i].frame = 0;//第幾張
-            NpcRole[i].frametime = 0;
-            //螢幕上地圖位置
-            NpcRole[i].srcx = Number(npc_sets[i].map_offset_x) * 48;
-            NpcRole[i].srcy = Number(npc_sets[i].map_offset_y) * 48;
-
-            NpcRole[i].waypointX = 0; NpcRole[i].waypointY = 0;
-            if (npc_sets[i].path == 'cruise') { //人物來回移動的另一點
-                NpcRole[i].waypointX = NpcRole[i].path_end_x;
-                NpcRole[i].waypointY = NpcRole[i].path_end_y;
-            }
-            else if (npc_sets[i].path == 'random') { RandomRoleWaypointXY(NpcRole[i]); }
-
-            var pic = 'assets/' + npc_sets[i].type + "_" + npc_sets[i].npc_id + ".png";
-            var img = new Image(); img.onload = function () { g_nLoad++; }; img.src = pic;
-            NpcRole[i].img = new Image(); NpcRole[i].img = img;
-
-
-            //console.log(npc_sets[i].dialog);
+        NpcRole[i].waypointX = 0; NpcRole[i].waypointY = 0;
+        if (npc_sets[i].path == 'cruise') { //人物來回移動的另一點
+            NpcRole[i].waypointX = NpcRole[i].path_end_x;
+            NpcRole[i].waypointY = NpcRole[i].path_end_y;
         }
-    })
-        //載入完成
-        .done(function () { g_loading_ok = true; })
+        else if (npc_sets[i].path == 'random') { RandomRoleWaypointXY(NpcRole[i]); }
+
+        var pic = 'assets/' + npc_sets[i].type + "_" + npc_sets[i].npc_id + ".png";
+        var img = new Image(); img.onload = function () { g_nLoad++; }; img.src = pic;
+        NpcRole[i].img = new Image(); NpcRole[i].img = img;
+    }
+}
+
+function normalizeLocalNpcData(data) {
+    if (!data) return [];
+    if (Object.prototype.toString.call(data) === "[object Array]") {
+        if (data.length > 0 && Object.prototype.toString.call(data[0]) === "[object Array]") {
+            return parse_data_new(data);
+        }
+        return data;
+    }
+    if (data.exhibits) return data.exhibits;
+    if (data.npcs) {
+        if (data.npcs.length > 0 && Object.prototype.toString.call(data.npcs[0]) === "[object Array]") {
+            return parse_data_new(data.npcs);
+        }
+        return data.npcs;
+    }
+    if (data.table) return parse_data_new(data.table);
+    return [];
+}
+
+function markNpcLoaded() {
+    g_npc_data_ok = true;
+    tryFinishLoading();
+}
+
+function localNpcUrls(mapid) {
+    return [
+        "data/map_" + mapid + "_exhibits.json",
+        "data/map_" + mapid + ".json"
+    ];
+}
+
+function LoadNPC(mapid) {
+    NpcRole = [];
+    tryLocalNpc(mapid, 0);
+}
+
+// Local JSON only. Never falls back to Apps Script or a remote NPC fetch.
+function tryLocalNpc(mapid, idx) {
+    var urls = localNpcUrls(mapid);
+    if (idx >= urls.length) {
+        applyNpcSets([]);
+        markNpcLoaded();
+        return;
+    }
+    $.ajax({
+        url: urls[idx],
+        dataType: "json"
+    }).done(function (data) {
+        var npc_sets = normalizeLocalNpcData(data);
+        console.log(npc_sets);
+        applyNpcSets(npc_sets);
+        markNpcLoaded();
+    }).fail(function () {
+        tryLocalNpc(mapid, idx + 1);
+    });
 }
 
 
@@ -203,6 +264,7 @@ function DrawPlayer(npc) {
 }
 
 function DrawNpc(npc) {
+    if (npc.draw === false) return;
     //建築物
     if (npc.type == 'static') {
         Bitblt(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, npc.srcx - VirualScreen.srcx, npc.srcy - VirualScreen.srcy);

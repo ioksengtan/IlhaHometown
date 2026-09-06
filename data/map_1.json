@@ -1,0 +1,73 @@
+{
+  "map_id": 1,
+  "source": "placeholder",
+  "notes": "PLACEHOLDER — not an Apps Script / Sheets export. Live GetNPCsFromMapID returned HTTP 403 Access Denied (2026-09-06). Demo static hotspots near map-1 spawn so the island can enter GAME offline. Replace with a real snapshot when Sheets is readable. Island → studio entrance is out of scope.",
+  "npcs": [
+    {
+      "id": "demo_welcome",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "【佔位】芎林島歡迎牌",
+      "map_offset_x": 29,
+      "map_offset_y": 20,
+      "offset_x": 2,
+      "offset_y": 9,
+      "path_end_x": 2,
+      "path_end_y": 1,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<h2>芎林島</h2><p><strong>【佔位 NPC】</strong>這不是 Sheets 匯出，而是離線演示熱區。Apps Script 目前 Access Denied。</p><p>正式島嶼人物／建物資料進庫後，請覆蓋 <code>data/map_1.json</code>。</p>"
+        ]
+      }
+    },
+    {
+      "id": "demo_landmark",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "【佔位】中島地標",
+      "map_offset_x": 34,
+      "map_offset_y": 22,
+      "offset_x": 0,
+      "offset_y": 6,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p><strong>【佔位】</strong>中島地標。點一下關閉。島嶼入口進工作室尚未串接。</p>"
+        ]
+      }
+    },
+    {
+      "id": "demo_notice",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "【佔位】告示",
+      "map_offset_x": 27,
+      "map_offset_y": 26,
+      "offset_x": 1,
+      "offset_y": 9,
+      "path_end_x": 1,
+      "path_end_y": 1,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "type_argument": [""],
+        "html": [
+          "<p><strong>【佔位告示】</strong>本圖 NPC 為本地 JSON。主線不再呼叫 script.google.com。</p>"
+        ]
+      }
+    }
+  ]
+}
