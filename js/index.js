@@ -96,16 +96,32 @@ function clampStudioCamera() {
     if (VirualScreen.srcy > maxy) VirualScreen.srcy = maxy;
 }
 
+function studioPlayerBounds() {
+    var extra = 48 * STUDIO_PLAYER_SCALE - 48;
+    var minx = 24;
+    var miny = extra;
+    return {
+        minx: minx,
+        miny: miny,
+        maxx: Math.max(minx, imgMap.width - 48 - extra / 2),
+        maxy: Math.max(miny, imgMap.height - 48)
+    };
+}
+
+function clampStudioPlayerXY(x, y) {
+    var b = studioPlayerBounds();
+    if (x < b.minx) x = b.minx;
+    if (y < b.miny) y = b.miny;
+    if (x > b.maxx) x = b.maxx;
+    if (y > b.maxy) y = b.maxy;
+    return { x: x, y: y };
+}
+
 function clampStudioPlayerPos() {
     if (!isStudioMap() || !imgMap) return;
-    var minx = 24;
-    var miny = 0;
-    var maxx = Math.max(minx, imgMap.width - 48);
-    var maxy = Math.max(miny, imgMap.height - 48);
-    if (Player.srcx < minx) Player.srcx = minx;
-    if (Player.srcy < miny) Player.srcy = miny;
-    if (Player.srcx > maxx) Player.srcx = maxx;
-    if (Player.srcy > maxy) Player.srcy = maxy;
+    var p = clampStudioPlayerXY(Player.srcx, Player.srcy);
+    Player.srcx = p.x;
+    Player.srcy = p.y;
 }
 
 function playerDrawScale(role) {
@@ -428,6 +444,11 @@ function onMouseDown(e) {
         if (Player.desty < 0) Player.desty = 0;
         if (Player.destx > imgMap.width - 48) Player.destx = imgMap.width - 48;
         if (Player.desty > imgMap.height - 48) Player.desty = imgMap.height - 48;
+        if (isStudioMap() && imgMap) {
+            var dest = clampStudioPlayerXY(Player.destx, Player.desty);
+            Player.destx = dest.x;
+            Player.desty = dest.y;
+        }
     }
 }
 
