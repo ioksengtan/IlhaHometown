@@ -1,0 +1,110 @@
+{
+  "map_id": 13,
+  "map_name": "工作室",
+  "notes": "Studio hub exhibits for map 13. Copy and URLs are placeholders (【內容待補】) and can be swapped without engine changes. Island → studio entrance is out of scope. Field shapes match LoadNPC / parse_data_new output: type, npc_id, map_offset_x/y, offset_x/y, path_end_x/y (build size), range, path, event_type, dialog.{type,html,type_argument}. Coordinates are tiles; the engine multiplies many fields by 48.",
+  "npcs": [
+    {
+      "npc_id": 1,
+      "npc_description": "門：返回芎林島（map 1）",
+      "type": "static",
+      "path": "fixed",
+      "range": 0,
+      "offset_x": 2,
+      "offset_y": 6,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "map_offset_x": 30,
+      "map_offset_y": 30,
+      "event_type": 1,
+      "dialog": {
+        "type": ["change_map"],
+        "html": [""],
+        "type_argument": ["1"]
+      }
+    },
+    {
+      "npc_id": 1,
+      "npc_description": "溜溜（佔位展區）",
+      "type": "static",
+      "path": "fixed",
+      "range": 0,
+      "offset_x": 1,
+      "offset_y": 8,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "map_offset_x": 21,
+      "map_offset_y": 16,
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "html": [
+          "<h2>溜溜</h2><p><strong>【內容待補】</strong>工作室展區「溜溜」佔位說明。正式文案與素材尚未入庫，可直接改 <code>data/map_13.json</code>。</p><p>溜溜紀念繪本：五個每天不用約定就會相遇的身影，在竹22的稻田與暮色之間。</p><p><a href=\"https://github.com/ioksengtan/liuliu_walk\" target=\"_blank\">開啟溜溜專案（外部連結）</a></p><p><em>點空白處關閉。連結另開分頁。</em></p>"
+        ],
+        "type_argument": [""]
+      }
+    },
+    {
+      "npc_id": 2,
+      "npc_description": "Celebrities（佔位展區）",
+      "type": "static",
+      "path": "fixed",
+      "range": 0,
+      "offset_x": 0,
+      "offset_y": 10,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "map_offset_x": 27,
+      "map_offset_y": 15,
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "html": [
+          "<h2>Celebrities</h2><p><strong>【內容待補】</strong>工作室展區「Celebrities」佔位說明。正式導讀／單字卡內容尚未掛上。</p><p>以科技名人演講與訪談為素材的產品實驗（導讀、單字卡、視覺化）。</p><p><a href=\"https://ioksengtan.github.io/celebrities/\" target=\"_blank\">開啟 Celebrities（外部連結）</a></p><p><em>點空白處關閉。連結另開分頁。</em></p>"
+        ],
+        "type_argument": [""]
+      }
+    },
+    {
+      "npc_id": 2,
+      "npc_description": "Listmap（佔位展區）",
+      "type": "static",
+      "path": "fixed",
+      "range": 0,
+      "offset_x": 0,
+      "offset_y": 6,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "map_offset_x": 34,
+      "map_offset_y": 15,
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "html": [
+          "<h2>Listmap</h2><p><strong>【內容待補】</strong>工作室展區「Listmap」佔位說明。本圖不實作 Listmap，只放外部連結。</p><p><a href=\"https://github.com/ioksengtan/ListMap.v1\" target=\"_blank\">開啟 Listmap（外部連結）</a></p><p><em>點空白處關閉。連結另開分頁。</em></p>"
+        ],
+        "type_argument": [""]
+      }
+    },
+    {
+      "npc_id": 5,
+      "npc_description": "小遊戲（佔位展區）",
+      "type": "static",
+      "path": "fixed",
+      "range": 0,
+      "offset_x": 5,
+      "offset_y": 14,
+      "path_end_x": 3,
+      "path_end_y": 2,
+      "map_offset_x": 38,
+      "map_offset_y": 22,
+      "event_type": 1,
+      "dialog": {
+        "type": ["page"],
+        "html": [
+          "<h2>小遊戲</h2><p><strong>【內容待補】</strong>工作室展區「小遊戲」佔位說明。本圖不掛象棋／其他未合併遊戲。</p><p><a href=\"https://github.com/ioksengtan/guess-lineup\" target=\"_blank\">開啟小遊戲（外部連結）</a></p><p><em>點空白處關閉。連結另開分頁。</em></p>"
+        ],
+        "type_argument": [""]
+      }
+    }
+  ]
+}
