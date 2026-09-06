@@ -31,6 +31,15 @@ function OnLoad() {
     canvas.addEventListener("mousemove", onMouseMove, false);
     canvas.addEventListener("mousedown", onMouseDown, false);
     canvas.addEventListener("mouseup", onMouseUp, false);
+    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+    canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+    canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+
+    fitPlayfield();
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", fitPlayfield, false);
+    }
+    window.addEventListener("orientationchange", fitPlayfield, false);
 
     LoadMap(getBootMapId());
 
@@ -45,10 +54,41 @@ function OnLoad() {
 }
 
 function OnResize() {
+    fitPlayfield();
     console.log(canvas.scrollWidth);
 
     var div = document.getElementById('dialog'); div.style.width = canvas.scrollWidth * 0.9 + "px";
     div = document.getElementById('page'); div.style.width = canvas.scrollWidth * 0.8 + "px";
+}
+
+// Size the *displayed* canvas to the visible viewport while keeping the 1024x768
+// bitmap (Screen_w / Screen_h) unchanged. Camera follow already centers the
+// player in that bitmap; the phone bug was that CSS height:100% overflowed the
+// viewport so only a left strip of the bitmap was on screen.
+function fitPlayfield() {
+    var c = document.getElementById("canvas");
+    if (!c || !c.width || !c.height) return;
+
+    var vw = window.innerWidth || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    if (window.visualViewport) {
+        vw = window.visualViewport.width;
+        vh = window.visualViewport.height;
+    }
+
+    var aspect = c.width / c.height;
+    var dw, dh;
+    if (vw / vh > aspect) {
+        dh = vh;
+        dw = vh * aspect;
+    } else {
+        dw = vw;
+        dh = vw / aspect;
+    }
+
+    c.style.width = Math.floor(dw) + "px";
+    c.style.height = Math.floor(dh) + "px";
+    // CSS uses top/left 50% + translate(-50%,-50%) to keep the box centered.
 }
 
 function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }
@@ -402,6 +442,31 @@ function onMouseUp(e) {
 
 
 function onMouseMove(e) { getMousePos(canvas, e); }
+
+function touchAsMouse(e) {
+    var t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
+    if (!t) return null;
+    return { button: 0, clientX: t.clientX, clientY: t.clientY };
+}
+
+function onTouchStart(e) {
+    if (e.touches && e.touches.length > 1) return;
+    if (e.cancelable) e.preventDefault();
+    var fake = touchAsMouse(e);
+    if (fake) onMouseDown(fake);
+}
+
+function onTouchEnd(e) {
+    if (e.cancelable) e.preventDefault();
+    var fake = touchAsMouse(e);
+    if (fake) onMouseUp(fake);
+}
+
+function onTouchMove(e) {
+    if (e.cancelable) e.preventDefault();
+    var fake = touchAsMouse(e);
+    if (fake) onMouseMove(fake);
+}
 
 function game_Update() {
 

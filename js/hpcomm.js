@@ -17,8 +17,10 @@ var g_mouseDown = false;
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect(); // abs. size of element
-    var scaleX = canvas.width / rect.width;    // relationship bitmap vs. element for X
-    var scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
+    var displayW = rect.width || canvas.width;
+    var displayH = rect.height || canvas.height;
+    var scaleX = canvas.width / displayW;    // relationship bitmap vs. element for X
+    var scaleY = canvas.height / displayH;  // relationship bitmap vs. element for Y
 
     g_mx = (evt.clientX - rect.left) * scaleX;  // scale mouse coordinates after they have
     g_my = (evt.clientY - rect.top) * scaleY;     // been adjusted to be relative to element
