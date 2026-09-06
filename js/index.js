@@ -186,12 +186,6 @@ function markNpcLoaded() {
     tryFinishLoading();
 }
 
-// Dead: former Apps Script + Sheets NPC pipeline (cut from the main line).
-// Live LoadNPC never calls script.google.com. Historical endpoint (Access Denied):
-// https://script.google.com/macros/s/AKfycbwx3nI_8tFQmh9EXUhelzGJFeXrgCNX6CVUY3nDqzp_hevRq86UE8uXmbhHfqqAt3AP/exec
-// ?url=https://docs.google.com/spreadsheets/d/1SyVO7OwOGEy3gyIX2kP4BAxDZRaVVfTeWul2LXIJcOU/edit#gid=947896803
-// &name=Resources&command=GetNPCsFromMapID&map_id=<id>
-
 function localNpcUrls(mapid) {
     return [
         "data/map_" + mapid + "_exhibits.json",
@@ -204,10 +198,10 @@ function LoadNPC(mapid) {
     tryLocalNpc(mapid, 0);
 }
 
+// Local JSON only. Never falls back to Apps Script or a remote NPC fetch.
 function tryLocalNpc(mapid, idx) {
     var urls = localNpcUrls(mapid);
     if (idx >= urls.length) {
-        console.log("LoadNPC: no local JSON for map " + mapid + "; entering GAME with empty NPCs");
         applyNpcSets([]);
         markNpcLoaded();
         return;
