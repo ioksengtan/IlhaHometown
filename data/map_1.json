@@ -68,6 +68,26 @@
           "<p><strong>【佔位告示】</strong>本圖 NPC 為本地 JSON。主線不再呼叫 script.google.com。</p>"
         ]
       }
+    },
+    {
+      "id": "demo_e_unit",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "E戶",
+      "map_offset_x": 32,
+      "map_offset_y": 24,
+      "offset_x": 2,
+      "offset_y": 9,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["14"],
+        "html": [""]
+      }
     }
   ]
 }

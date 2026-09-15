@@ -16,9 +16,12 @@ var Player = { srcx: 0, srcy: 0, destx: 0, desty: 0, img: null, dir: 0, frame: 0
 var NpcRole = [];
 var VirualScreen = { srcx: 0, srcy: 0 };
 var g_mapid = 1;
-const STUDIO_MAP_ID = 13;
-const STUDIO_PLAYER_SCALE = 3;
-const STUDIO_VIEW_ZOOM = 1.5;
+// Indoor / large-art maps: bigger player + tighter view. Camera clamp is
+// independent — any bitmap larger than the view is clamped (no edge stretch).
+var studioScaleMaps = {
+    13: { scale: 3, zoom: 1.5 },
+    14: { scale: 3, zoom: 1.5 }
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,30 +128,32 @@ function tryFinishLoading() {
     if (g_map_image_ok && g_npc_data_ok) g_loading_ok = true;
 }
 
-function isStudioMap() { return g_mapid === STUDIO_MAP_ID; }
+function mapScaleConfig() {
+    return studioScaleMaps[g_mapid] || { scale: 1, zoom: 1 };
+}
 
-function studioZoom() { return isStudioMap() ? STUDIO_VIEW_ZOOM : 1; }
+function viewZoom() { return mapScaleConfig().zoom; }
 
-function studioViewW() { return Screen_w / studioZoom(); }
+function viewW() { return Screen_w / viewZoom(); }
 
-function studioViewH() { return Screen_h / studioZoom(); }
+function viewH() { return Screen_h / viewZoom(); }
 
-function worldToScreenX(wx) { return (wx - VirualScreen.srcx) * studioZoom(); }
+function worldToScreenX(wx) { return (wx - VirualScreen.srcx) * viewZoom(); }
 
-function worldToScreenY(wy) { return (wy - VirualScreen.srcy) * studioZoom(); }
+function worldToScreenY(wy) { return (wy - VirualScreen.srcy) * viewZoom(); }
 
-function clampStudioCamera() {
-    if (!isStudioMap() || !imgMap) return;
-    var maxx = Math.max(0, imgMap.width - studioViewW());
-    var maxy = Math.max(0, imgMap.height - studioViewH());
+function clampCamera() {
+    if (!imgMap) return;
+    var maxx = Math.max(0, imgMap.width - viewW());
+    var maxy = Math.max(0, imgMap.height - viewH());
     if (VirualScreen.srcx < 0) VirualScreen.srcx = 0;
     if (VirualScreen.srcy < 0) VirualScreen.srcy = 0;
     if (VirualScreen.srcx > maxx) VirualScreen.srcx = maxx;
     if (VirualScreen.srcy > maxy) VirualScreen.srcy = maxy;
 }
 
-function studioPlayerBounds() {
-    var extra = 48 * STUDIO_PLAYER_SCALE - 48;
+function scaledPlayerBounds() {
+    var extra = 48 * mapScaleConfig().scale - 48;
     var minx = extra / 2;
     var miny = extra;
     return {
@@ -159,8 +164,8 @@ function studioPlayerBounds() {
     };
 }
 
-function clampStudioPlayerXY(x, y) {
-    var b = studioPlayerBounds();
+function clampScaledPlayerXY(x, y) {
+    var b = scaledPlayerBounds();
     if (x < b.minx) x = b.minx;
     if (y < b.miny) y = b.miny;
     if (x > b.maxx) x = b.maxx;
@@ -168,15 +173,15 @@ function clampStudioPlayerXY(x, y) {
     return { x: x, y: y };
 }
 
-function clampStudioPlayerPos() {
-    if (!isStudioMap() || !imgMap) return;
-    var p = clampStudioPlayerXY(Player.srcx, Player.srcy);
+function clampScaledPlayerPos() {
+    if (!imgMap || mapScaleConfig().scale === 1) return;
+    var p = clampScaledPlayerXY(Player.srcx, Player.srcy);
     Player.srcx = p.x;
     Player.srcy = p.y;
 }
 
 function playerDrawScale(role) {
-    if (role === Player && isStudioMap()) return STUDIO_PLAYER_SCALE;
+    if (role === Player) return mapScaleConfig().scale;
     return 1;
 }
 
@@ -201,9 +206,9 @@ function LoadMap(mapid) {
         Player.destx = Player.srcx;
         Player.desty = Player.srcy;
 
-        VirualScreen.srcx = Player.srcx - studioViewW() / 2;
-        VirualScreen.srcy = Player.srcy - studioViewH() / 2;
-        clampStudioCamera();
+        VirualScreen.srcx = Player.srcx - viewW() / 2;
+        VirualScreen.srcy = Player.srcy - viewH() / 2;
+        clampCamera();
 
         g_map_image_ok = true;
         tryFinishLoading();
@@ -349,7 +354,7 @@ function get_selected_npc_id() { //get_selected_npc_id
     //console.log("mx" + g_mx + " my" + g_my);
     if (m_screen == SCREEN_GAME) {
 
-        var z = studioZoom();
+        var z = viewZoom();
         for (var i = 0; i < NpcRole.length; i++) {
             var x = worldToScreenX(NpcRole[i].srcx);
             var y = worldToScreenY(NpcRole[i].srcy);
@@ -363,7 +368,7 @@ function get_selected_npc_id() { //get_selected_npc_id
 function DrawPlayer(npc) {
     var gy = npc.dir * 48;
     var scale = playerDrawScale(npc);
-    var z = studioZoom();
+    var z = viewZoom();
     var dx = worldToScreenX(npc.srcx);
     var dy = worldToScreenY(npc.srcy);
     if (scale === 1 && z === 1) {
@@ -383,7 +388,7 @@ function DrawNpc(npc) {
     if (npc.draw === false) return;
     //建築物
     if (npc.type == 'static') {
-        var z = studioZoom();
+        var z = viewZoom();
         var dx = worldToScreenX(npc.srcx);
         var dy = worldToScreenY(npc.srcy);
         if (z === 1) Bitblt(npc.img, npc.build_offx, npc.build_offy, npc.build_w, npc.build_h, dx, dy);
@@ -474,16 +479,16 @@ function MapScroll() {
 
     if (Player.srcx < 24) Player.srcx = 24;
     if (Player.srcy < 0) Player.srcy = 0;
-    clampStudioPlayerPos();
+    clampScaledPlayerPos();
 
-    var vw = studioViewW();
-    var vh = studioViewH();
+    var vw = viewW();
+    var vh = viewH();
     VirualScreen.srcx = Player.srcx - vw / 2;
     VirualScreen.srcy = Player.srcy - vh / 2;
-    clampStudioCamera();
+    clampCamera();
 
     context.fillStyle = 'rgb(0,0,0)'; context.fillRect(0, 0, canvas.width, canvas.height);
-    if (studioZoom() === 1) Bitblt(imgMap, VirualScreen.srcx, VirualScreen.srcy, Screen_w, Screen_h, 0, 0);
+    if (viewZoom() === 1) Bitblt(imgMap, VirualScreen.srcx, VirualScreen.srcy, Screen_w, Screen_h, 0, 0);
     else BitbltScale(imgMap, VirualScreen.srcx, VirualScreen.srcy, vw, vh, 0, 0, Screen_w, Screen_h);
 }
 
@@ -501,7 +506,7 @@ function onMouseDown(e) {
             return;
         }
 
-        var z = studioZoom();
+        var z = viewZoom();
         Player.destx = VirualScreen.srcx + g_mx / z;
         Player.desty = VirualScreen.srcy + g_my / z;
 
@@ -509,8 +514,8 @@ function onMouseDown(e) {
         if (Player.desty < 0) Player.desty = 0;
         if (Player.destx > imgMap.width - 48) Player.destx = imgMap.width - 48;
         if (Player.desty > imgMap.height - 48) Player.desty = imgMap.height - 48;
-        if (isStudioMap() && imgMap) {
-            var dest = clampStudioPlayerXY(Player.destx, Player.desty);
+        if (imgMap && mapScaleConfig().scale !== 1) {
+            var dest = clampScaledPlayerXY(Player.destx, Player.desty);
             Player.destx = dest.x;
             Player.desty = dest.y;
         }

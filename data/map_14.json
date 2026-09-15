@@ -1,0 +1,74 @@
+{
+  "map_id": 14,
+  "source": "e-unit-demo",
+  "notes": "E戶 apartment furniture-layout demo. Static hotspots on 48px grid; draw:false so floor art is not covered by character sprites. Exit change_map → map 1.",
+  "npcs": [
+    {
+      "id": "e_unit_living",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "客廳",
+      "map_offset_x": 31,
+      "map_offset_y": 16,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 20,
+      "path_end_y": 14,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>客廳。沙發面對陽台，餐桌在中間。</p>"
+        ]
+      }
+    },
+    {
+      "id": "e_unit_master",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "主臥",
+      "map_offset_x": 14,
+      "map_offset_y": 34,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 14,
+      "path_end_y": 13,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>主臥。床靠窗，浴室在左邊。</p>"
+        ]
+      }
+    },
+    {
+      "id": "e_unit_exit",
+      "npc_id": 3,
+      "type": "static",
+      "npc_description": "門口｜回芎林島",
+      "map_offset_x": 43,
+      "map_offset_y": 6,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 13,
+      "path_end_y": 10,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["1"],
+        "html": [""]
+      }
+    }
+  ]
+}
