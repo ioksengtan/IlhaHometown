@@ -20,7 +20,9 @@ var g_mapid = 1;
 // independent — any bitmap larger than the view is clamped (no edge stretch).
 var studioScaleMaps = {
     13: { scale: 3, zoom: 1.5 },
-    14: { scale: 3, zoom: 1.5 }
+    14: { scale: 3, zoom: 1.5 },
+    15: { scale: 3, zoom: 1.5 },
+    16: { scale: 3, zoom: 1.5 }
 };
 
 

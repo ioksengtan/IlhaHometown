@@ -88,6 +88,26 @@
         "type_argument": ["14"],
         "html": [""]
       }
+    },
+    {
+      "id": "demo_xiaoyaoyuan",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "逍遙園",
+      "map_offset_x": 30,
+      "map_offset_y": 22,
+      "offset_x": 0,
+      "offset_y": 6,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["15"],
+        "html": [""]
+      }
     }
   ]
 }
