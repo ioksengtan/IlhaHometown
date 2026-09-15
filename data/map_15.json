@@ -1,0 +1,95 @@
+{
+  "map_id": 15,
+  "source": "xiaoyaoyuan-1f-demo",
+  "notes": "逍遙園 1F space-plan demo. Static hotspots, draw:false. Stairs change_map → 16; 車寄 change_map → 1.",
+  "npcs": [
+    {
+      "id": "xyy_1f_dining",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "大食堂",
+      "map_offset_x": 13,
+      "map_offset_y": 13,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 29,
+      "path_end_y": 12,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>大食堂。開園式當天招待客人用。</p>"
+        ]
+      }
+    },
+    {
+      "id": "xyy_1f_shelter",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "大防空壕",
+      "map_offset_x": 13,
+      "map_offset_y": 25,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 29,
+      "path_end_y": 11,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>大防空壕。報載容納一百八十人。</p>"
+        ]
+      }
+    },
+    {
+      "id": "xyy_1f_stairs",
+      "npc_id": 3,
+      "type": "static",
+      "npc_description": "樓梯｜上二樓",
+      "map_offset_x": 15,
+      "map_offset_y": 37,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 6,
+      "path_end_y": 7,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["16"],
+        "html": [""]
+      }
+    },
+    {
+      "id": "xyy_1f_porch",
+      "npc_id": 4,
+      "type": "static",
+      "npc_description": "車寄｜回芎林島",
+      "map_offset_x": 13,
+      "map_offset_y": 45,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 11,
+      "path_end_y": 8,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["1"],
+        "html": [""]
+      }
+    }
+  ]
+}

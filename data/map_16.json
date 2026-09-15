@@ -1,0 +1,74 @@
+{
+  "map_id": 16,
+  "source": "xiaoyaoyuan-2f-demo",
+  "notes": "逍遙園 2F space-plan demo. Static hotspots, draw:false. Stairs change_map → 15 (matching 1F).",
+  "npcs": [
+    {
+      "id": "xyy_2f_hiroma",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "廣間",
+      "map_offset_x": 16,
+      "map_offset_y": 13,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 15,
+      "path_end_y": 14,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>廣間。會客、品茗、講道及用餐的空間。</p>"
+        ]
+      }
+    },
+    {
+      "id": "xyy_2f_shosai",
+      "npc_id": 2,
+      "type": "static",
+      "npc_description": "書齋",
+      "map_offset_x": 32,
+      "map_offset_y": 13,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 15,
+      "path_end_y": 15,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["dialog"],
+        "type_argument": [""],
+        "html": [
+          "<p>書齋。寫作、繪圖及起居生活的空間。</p>"
+        ]
+      }
+    },
+    {
+      "id": "xyy_2f_stairs",
+      "npc_id": 3,
+      "type": "static",
+      "npc_description": "樓梯｜下一樓",
+      "map_offset_x": 14,
+      "map_offset_y": 38,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 7,
+      "path_end_y": 9,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["15"],
+        "html": [""]
+      }
+    }
+  ]
+}
