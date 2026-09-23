@@ -15,6 +15,9 @@
 		height: 100%;
 		overflow: hidden;
 		background: #000;
+		touch-action: manipulation;
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
 	}
 
 	canvas {
@@ -49,58 +52,82 @@
 		}
 	}
 
-	.cssdialog {
-		/*border: 4px solid red;*/
-		/*background-color :white;*/
-		background-image:url( 'assets/talk.png' );
-		display:none;
-
-		padding: 0;
-		margin: auto;
-		display: block;
-		height: 26%;
-
-		margin-bottom: 10px;
+	/* Dialog and NPC pages share one viewport-sized box.
+	   Desktop caps stay 1000px / 900px; phones use the visible width
+	   instead of a fixed 900px panel that overflows portrait screens. */
+	.cssdialog,
+	.csspage {
+		background-image: url('assets/talk.png');
+		box-sizing: border-box;
+		display: none;
 		position: fixed;
+		z-index: 5;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-	
-		max-width: 1000px;
-		
-		padding-left:30px;
-  		padding-right:30px; 
-		overflow:auto;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 16px 30px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		touch-action: manipulation;
+		cursor: pointer;
+		-webkit-user-select: none;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		color: #222;
+		overflow-wrap: anywhere;
+	}
+
+	.cssdialog img,
+	.csspage img,
+	.cssdialog video,
+	.csspage video,
+	.cssdialog iframe,
+	.csspage iframe {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.cssdialog a,
+	.csspage a {
+		cursor: pointer;
+	}
+
+	.cssdialog {
+		height: 26%;
+		margin-top: auto;
+		margin-bottom: 10px;
+		width: min(1000px, calc(100% - 24px));
+		max-width: min(1000px, calc(100% - 24px));
 	}
 
 	.csspage {
-		/*border: 2px solid green;*/
-		/*background-color :white;*/
-		background-image:url( 'assets/talk.png' );
-		display:none;
-
-		padding: 0;
-		margin: auto;
-		display: block;
-	
 		margin-top: 100px;
 		margin-bottom: 80px;
-			 
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		
-		width: 900px;
-		
-		
-		padding-left:30px;
-  		padding-right:30px; 
-		
-		  overflow:auto;
-		/*overflow-x:hidden;*/
+		width: min(900px, calc(100% - 24px));
+		max-width: min(900px, calc(100% - 24px));
+	}
+
+	@media (max-width: 600px) {
+		.cssdialog,
+		.csspage {
+			padding-left: 16px;
+			padding-right: 16px;
+			font-size: 18px;
+			line-height: 1.5;
+		}
+
+		.cssdialog {
+			height: 36%;
+		}
+
+		.csspage {
+			margin-top: 16px;
+			margin-bottom: 16px;
+		}
 	}
 
 	 
