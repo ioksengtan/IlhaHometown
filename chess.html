@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+	<meta charset="utf-8">
+	<title>象棋</title>
+</head>
+
+<style>
+	canvas {
+		padding: 0;
+		margin: auto;
+		display: block;
+		height: 100%;
+
+		margin-top: 0%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+
+		background: #f2d9a8;
+	}
+
+	.cssdialog {
+		background-image: url('assets/talk.png');
+		display: none;
+
+		padding: 0;
+		margin: auto;
+		display: block;
+		height: 26%;
+
+		margin-bottom: 10px;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+
+		max-width: 1000px;
+
+		padding-left: 30px;
+		padding-right: 30px;
+		overflow: auto;
+	}
+</style>
+
+<body onload="OnLoad()" onresize="OnResize()">
+	<canvas id="canvas" width="580" height="640"></canvas>
+	<div class="cssdialog" id="dialog"></div>
+
+	<script src="js/chess.js"></script>
+</body>
+
+</html>
