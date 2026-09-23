@@ -133,7 +133,7 @@
 	 
 </style>
 
-<body onload="OnLoad()" onresize="OnResize()">
+<body onload="OnLoad()" onresize="if (window.OnResize) OnResize()">
 	<canvas id="canvas" width="1024" height="768"></canvas>
 	<div class="cssdialog" id="dialog"></div>
 	<div class="csspage" id="page"> </div>
