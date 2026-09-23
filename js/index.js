@@ -42,8 +42,10 @@ function OnLoad() {
     fitPlayfield();
     if (window.visualViewport) {
         window.visualViewport.addEventListener("resize", fitPlayfield, false);
+        window.visualViewport.addEventListener("scroll", fitPlayfield, false);
     }
     window.addEventListener("orientationchange", fitPlayfield, false);
+    installDoubleTapGuard();
 
     LoadMap(getBootMapId());
 
@@ -106,9 +108,50 @@ function viewportCssSize() {
     return { w: vw, h: vh };
 }
 
+function syncVisualViewportVars() {
+    var root = document.documentElement;
+    var layoutW = window.innerWidth || root.clientWidth || 0;
+    var layoutH = window.innerHeight || root.clientHeight || 0;
+    var vv = window.visualViewport;
+    var vvW = layoutW;
+    var vvH = layoutH;
+    var vvTop = 0;
+    var vvLeft = 0;
+    if (vv) {
+        if (vv.width) vvW = vv.width;
+        if (vv.height) vvH = vv.height;
+        vvTop = vv.offsetTop || 0;
+        vvLeft = vv.offsetLeft || 0;
+    }
+    root.style.setProperty("--vv-top", Math.round(vvTop) + "px");
+    root.style.setProperty("--vv-right", Math.round(Math.max(0, layoutW - vvW - vvLeft)) + "px");
+    root.style.setProperty("--vv-bottom", Math.round(Math.max(0, layoutH - vvH - vvTop)) + "px");
+    root.style.setProperty("--vv-left", Math.round(vvLeft) + "px");
+    root.style.setProperty("--vv-height", Math.round(vvH) + "px");
+    root.style.setProperty("--vv-width", Math.round(vvW) + "px");
+}
+
+function safeAreaInsets() {
+    var probe = document.createElement("div");
+    probe.setAttribute("aria-hidden", "true");
+    probe.style.cssText = "position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);";
+    document.documentElement.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    var insets = {
+        top: parseFloat(cs.paddingTop) || 0,
+        right: parseFloat(cs.paddingRight) || 0,
+        bottom: parseFloat(cs.paddingBottom) || 0,
+        left: parseFloat(cs.paddingLeft) || 0
+    };
+    probe.parentNode.removeChild(probe);
+    return insets;
+}
+
 function fitOverlayBoxes() {
+    syncVisualViewportVars();
     var vp = viewportCssSize();
-    var avail = Math.max(0, vp.w - 24);
+    var safe = safeAreaInsets();
+    var avail = Math.max(0, vp.w - 24 - safe.left - safe.right);
     var dialog = document.getElementById("dialog");
     var page = document.getElementById("page");
     if (dialog) {
@@ -121,6 +164,19 @@ function fitOverlayBoxes() {
         page.style.width = pageW;
         page.style.maxWidth = pageW;
     }
+}
+
+// A second tap inside the browser's double-tap window must not zoom the
+// page. Pinch (two fingers) is left alone so the page stays zoomable.
+function installDoubleTapGuard() {
+    var last = 0;
+    document.addEventListener("touchstart", function (e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        var now = Date.now();
+        var repeat = now - last < 300;
+        last = now;
+        if (repeat && e.cancelable) e.preventDefault();
+    }, { passive: false, capture: true });
 }
 
 function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }

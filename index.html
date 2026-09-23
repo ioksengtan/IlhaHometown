@@ -8,6 +8,14 @@
 </head>
 
 <style>
+	:root {
+		--vv-top: 0px;
+		--vv-right: 0px;
+		--vv-bottom: 0px;
+		--vv-left: 0px;
+		--vv-height: 100dvh;
+	}
+
 	html, body {
 		margin: 0;
 		padding: 0;
@@ -15,6 +23,7 @@
 		height: 100%;
 		overflow: hidden;
 		background: #000;
+		/* manipulation: pinch still works, double-tap zoom does not. */
 		touch-action: manipulation;
 		-webkit-text-size-adjust: 100%;
 		text-size-adjust: 100%;
@@ -54,7 +63,9 @@
 
 	/* Dialog and NPC pages share one viewport-sized box.
 	   Desktop caps stay 1000px / 900px; phones use the visible width
-	   instead of a fixed 900px panel that overflows portrait screens. */
+	   instead of a fixed 900px panel that overflows portrait screens.
+	   top/bottom follow the visual viewport plus the device safe area
+	   so the box stays above the URL bar, toolbar, and home indicator. */
 	.cssdialog,
 	.csspage {
 		background-image: url('assets/talk.png');
@@ -62,10 +73,10 @@
 		display: none;
 		position: fixed;
 		z-index: 5;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		left: calc(var(--vv-left, 0px) + env(safe-area-inset-left, 0px));
+		right: calc(var(--vv-right, 0px) + env(safe-area-inset-right, 0px));
+		margin-top: 0;
+		margin-bottom: 0;
 		margin-left: auto;
 		margin-right: auto;
 		padding: 16px 30px;
@@ -97,18 +108,20 @@
 	}
 
 	.cssdialog {
+		top: auto;
+		bottom: calc(10px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
 		height: 26%;
-		margin-top: auto;
-		margin-bottom: 10px;
-		width: min(1000px, calc(100% - 24px));
-		max-width: min(1000px, calc(100% - 24px));
+		height: 26svh;
+		max-height: calc(var(--vv-height, 100svh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--vv-top, 0px) - var(--vv-bottom, 0px) - 20px);
+		width: min(1000px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+		max-width: min(1000px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
 	}
 
 	.csspage {
-		margin-top: 100px;
-		margin-bottom: 80px;
-		width: min(900px, calc(100% - 24px));
-		max-width: min(900px, calc(100% - 24px));
+		top: calc(100px + env(safe-area-inset-top, 0px) + var(--vv-top, 0px));
+		bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
+		width: min(900px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+		max-width: min(900px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
 	}
 
 	@media (max-width: 600px) {
@@ -116,17 +129,20 @@
 		.csspage {
 			padding-left: 16px;
 			padding-right: 16px;
+			padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 			font-size: 18px;
 			line-height: 1.5;
 		}
 
 		.cssdialog {
 			height: 36%;
+			height: 36svh;
+			bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
 		}
 
 		.csspage {
-			margin-top: 16px;
-			margin-bottom: 16px;
+			top: calc(16px + env(safe-area-inset-top, 0px) + var(--vv-top, 0px));
+			bottom: calc(16px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
 		}
 	}
 
