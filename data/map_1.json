@@ -29,7 +29,7 @@
       "id": "demo_landmark",
       "npc_id": 2,
       "type": "static",
-      "npc_description": "【佔位】中島地標",
+      "npc_description": "島央地標",
       "map_offset_x": 34,
       "map_offset_y": 22,
       "offset_x": 0,
@@ -43,7 +43,7 @@
         "type": ["dialog"],
         "type_argument": [""],
         "html": [
-          "<p><strong>【佔位】</strong>中島地標。點一下關閉。島嶼入口進工作室尚未串接。</p>"
+          "<p>島中央這一帶視野開闊，常是認識芎林島方位的起點。點一下即可關閉。</p>"
         ]
       }
     },
@@ -51,7 +51,7 @@
       "id": "demo_notice",
       "npc_id": 1,
       "type": "static",
-      "npc_description": "【佔位】告示",
+      "npc_description": "島上告示",
       "map_offset_x": 27,
       "map_offset_y": 26,
       "offset_x": 1,
@@ -65,7 +65,7 @@
         "type": ["page"],
         "type_argument": [""],
         "html": [
-          "<p><strong>【佔位告示】</strong>本圖 NPC 為本地 JSON。主線不再呼叫 script.google.com。</p>"
+          "<h2>島上告示</h2><p>歡迎沿路走走，認識芎林的人、事與物。想到工作室看看，請往島緣的碼頭。</p>"
         ]
       }
     },
