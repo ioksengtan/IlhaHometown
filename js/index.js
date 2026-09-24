@@ -42,16 +42,15 @@ function OnLoad() {
     fitPlayfield();
     if (window.visualViewport) {
         window.visualViewport.addEventListener("resize", fitPlayfield, false);
+        window.visualViewport.addEventListener("scroll", fitPlayfield, false);
     }
     window.addEventListener("orientationchange", fitPlayfield, false);
+    installDoubleTapGuard();
 
     LoadMap(getBootMapId());
 
-    var oDiv = document.getElementById('dialog');
-    oDiv.addEventListener("click", DialogClick, false);
-
-    oDiv = document.getElementById('page');
-    oDiv.addEventListener("click", DialogClick, false);
+    bindOverlayDismiss(document.getElementById('dialog'));
+    bindOverlayDismiss(document.getElementById('page'));
 
     ShowDialog(false);
     ShowPage(false);
@@ -59,10 +58,6 @@ function OnLoad() {
 
 function OnResize() {
     fitPlayfield();
-    console.log(canvas.scrollWidth);
-
-    var div = document.getElementById('dialog'); div.style.width = canvas.scrollWidth * 0.9 + "px";
-    div = document.getElementById('page'); div.style.width = canvas.scrollWidth * 0.8 + "px";
 }
 
 // Size the *displayed* canvas to the visible viewport while keeping the 1024x768
@@ -71,7 +66,10 @@ function OnResize() {
 // viewport so only a left strip of the bitmap was on screen.
 function fitPlayfield() {
     var c = document.getElementById("canvas");
-    if (!c || !c.width || !c.height) return;
+    if (!c || !c.width || !c.height) {
+        fitOverlayBoxes();
+        return;
+    }
 
     var vw = window.innerWidth || document.documentElement.clientWidth;
     var vh = window.innerHeight || document.documentElement.clientHeight;
@@ -93,6 +91,92 @@ function fitPlayfield() {
     c.style.width = Math.floor(dw) + "px";
     c.style.height = Math.floor(dh) + "px";
     // CSS uses top/left 50% + translate(-50%,-50%) to keep the box centered.
+    fitOverlayBoxes();
+}
+
+// Dialog / page widths follow the visible viewport, capped at the old
+// desktop sizes (dialog 1000, page 900). Do not use canvas.scrollWidth:
+// it does not track the phone-sized playfield, and OnResize never ran
+// on first load, so the stylesheet's fixed 900px page stayed in effect.
+function viewportCssSize() {
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    if (window.visualViewport) {
+        if (window.visualViewport.width) vw = window.visualViewport.width;
+        if (window.visualViewport.height) vh = window.visualViewport.height;
+    }
+    return { w: vw, h: vh };
+}
+
+function syncVisualViewportVars() {
+    var root = document.documentElement;
+    var layoutW = window.innerWidth || root.clientWidth || 0;
+    var layoutH = window.innerHeight || root.clientHeight || 0;
+    var vv = window.visualViewport;
+    var vvW = layoutW;
+    var vvH = layoutH;
+    var vvTop = 0;
+    var vvLeft = 0;
+    if (vv) {
+        if (vv.width) vvW = vv.width;
+        if (vv.height) vvH = vv.height;
+        vvTop = vv.offsetTop || 0;
+        vvLeft = vv.offsetLeft || 0;
+    }
+    root.style.setProperty("--vv-top", Math.round(vvTop) + "px");
+    root.style.setProperty("--vv-right", Math.round(Math.max(0, layoutW - vvW - vvLeft)) + "px");
+    root.style.setProperty("--vv-bottom", Math.round(Math.max(0, layoutH - vvH - vvTop)) + "px");
+    root.style.setProperty("--vv-left", Math.round(vvLeft) + "px");
+    root.style.setProperty("--vv-height", Math.round(vvH) + "px");
+    root.style.setProperty("--vv-width", Math.round(vvW) + "px");
+}
+
+function safeAreaInsets() {
+    var probe = document.createElement("div");
+    probe.setAttribute("aria-hidden", "true");
+    probe.style.cssText = "position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);";
+    document.documentElement.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    var insets = {
+        top: parseFloat(cs.paddingTop) || 0,
+        right: parseFloat(cs.paddingRight) || 0,
+        bottom: parseFloat(cs.paddingBottom) || 0,
+        left: parseFloat(cs.paddingLeft) || 0
+    };
+    probe.parentNode.removeChild(probe);
+    return insets;
+}
+
+function fitOverlayBoxes() {
+    syncVisualViewportVars();
+    var vp = viewportCssSize();
+    var safe = safeAreaInsets();
+    var avail = Math.max(0, vp.w - 24 - safe.left - safe.right);
+    var dialog = document.getElementById("dialog");
+    var page = document.getElementById("page");
+    if (dialog) {
+        var dialogW = Math.floor(Math.min(1000, avail)) + "px";
+        dialog.style.width = dialogW;
+        dialog.style.maxWidth = dialogW;
+    }
+    if (page) {
+        var pageW = Math.floor(Math.min(900, avail)) + "px";
+        page.style.width = pageW;
+        page.style.maxWidth = pageW;
+    }
+}
+
+// A second tap inside the browser's double-tap window must not zoom the
+// page. Pinch (two fingers) is left alone so the page stays zoomable.
+function installDoubleTapGuard() {
+    var last = 0;
+    document.addEventListener("touchstart", function (e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        var now = Date.now();
+        var repeat = now - last < 300;
+        last = now;
+        if (repeat && e.cancelable) e.preventDefault();
+    }, { passive: false, capture: true });
 }
 
 function InsertDialog(params) { var div = document.getElementById('dialog'); div.scrollTop = 0; div.innerHTML = params; bindExternalDialogLinks(div); }
@@ -488,6 +572,7 @@ function MapScroll() {
 }
 
 function onMouseDown(e) {
+    if (!e.fromTouch && isGhostMouse()) return;
     if (e.button != 0) return; getMousePos(canvas, e);
 
     if (m_screen == SCREEN_DIALOG) { DialogClick(); return; }
@@ -517,13 +602,14 @@ function onMouseDown(e) {
     }
 }
 
-function DialogClick() { 
-	if (m_screen == SCREEN_DIALOG || SCREEN_PAGE) { 
-		DialogCmd(); 
-	} 
+function DialogClick() {
+    if (m_screen == SCREEN_DIALOG || m_screen == SCREEN_PAGE) {
+        DialogCmd();
+    }
 }
 
 function onMouseUp(e) {
+    if (!e.fromTouch && isGhostMouse()) return;
     if (e.button != 0) return; //左鍵
     getMousePos(canvas, e);
     switch (m_screen) {
@@ -532,16 +618,90 @@ function onMouseUp(e) {
 }
 
 
-function onMouseMove(e) { getMousePos(canvas, e); }
+function onMouseMove(e) {
+    if (!e.fromTouch && isGhostMouse()) return;
+    getMousePos(canvas, e);
+}
+
+// Touch browsers also synthesize mousedown/click after a tap. That second
+// event was advancing or closing a dialog the tap had just opened.
+var ghostMouseUntil = 0;
+
+function armTouchGuard() {
+    ghostMouseUntil = Date.now() + 1000;
+}
+
+function isGhostMouse() {
+    return Date.now() < ghostMouseUntil;
+}
+
+function interactiveAncestor(node) {
+    while (node) {
+        if (node.nodeType === 1) {
+            var tag = node.tagName;
+            if (tag === "A" || tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "LABEL") return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+function bindOverlayDismiss(el) {
+    if (!el) return;
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+
+    el.addEventListener("click", function (e) {
+        if (!isGhostMouse()) return;
+        e.preventDefault();
+        e.stopPropagation();
+    }, true);
+
+    el.addEventListener("touchstart", function (e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        if (interactiveAncestor(e.target)) return;
+        armTouchGuard();
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        tracking = true;
+    }, { passive: true });
+
+    el.addEventListener("touchend", function (e) {
+        if (!tracking) return;
+        tracking = false;
+        if (interactiveAncestor(e.target)) return;
+        var t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        var dx = t.clientX - startX;
+        var dy = t.clientY - startY;
+        if (dx * dx + dy * dy > 144) return;
+        armTouchGuard();
+        if (e.cancelable) e.preventDefault();
+        DialogClick();
+    }, { passive: false });
+
+    el.addEventListener("touchcancel", function () { tracking = false; }, false);
+
+    el.addEventListener("click", function (e) {
+        if (isGhostMouse()) return;
+        if (interactiveAncestor(e.target)) {
+            e.stopPropagation();
+            return;
+        }
+        DialogClick();
+    }, false);
+}
 
 function touchAsMouse(e) {
     var t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
     if (!t) return null;
-    return { button: 0, clientX: t.clientX, clientY: t.clientY };
+    return { button: 0, clientX: t.clientX, clientY: t.clientY, fromTouch: true };
 }
 
 function onTouchStart(e) {
     if (e.touches && e.touches.length > 1) return;
+    armTouchGuard();
     if (e.cancelable) e.preventDefault();
     var fake = touchAsMouse(e);
     if (fake) onMouseDown(fake);

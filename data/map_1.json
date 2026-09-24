@@ -1,13 +1,13 @@
 {
   "map_id": 1,
   "source": "placeholder",
-  "notes": "PLACEHOLDER — not an Apps Script / Sheets export. Live GetNPCsFromMapID returned HTTP 403 Access Denied (2026-09-06). Demo static hotspots near map-1 spawn so the island can enter GAME offline. Replace with a real snapshot when Sheets is readable. Island → studio entrance is out of scope.",
+  "notes": "PLACEHOLDER — not an Apps Script / Sheets export. Live GetNPCsFromMapID returned HTTP 403 Access Denied (2026-09-06). Demo static hotspots near map-1 spawn so the island can enter GAME offline. Replace with a real snapshot when Sheets is readable. A local hotspot on the south dock warps to map 13.",
   "npcs": [
     {
       "id": "demo_welcome",
       "npc_id": 1,
       "type": "static",
-      "npc_description": "【佔位】芎林島歡迎牌",
+      "npc_description": "芎林島歡迎牌",
       "map_offset_x": 29,
       "map_offset_y": 20,
       "offset_x": 2,
@@ -21,7 +21,7 @@
         "type": ["page"],
         "type_argument": [""],
         "html": [
-          "<h2>芎林島</h2><p><strong>【佔位 NPC】</strong>這不是 Sheets 匯出，而是離線演示熱區。Apps Script 目前 Access Denied。</p><p>正式島嶼人物／建物資料進庫後，請覆蓋 <code>data/map_1.json</code>。</p>"
+          "<h2>芎林島</h2><p>歡迎來到芎林島。沿著路上走走，可以認識這裡的人、事與物。到島緣的碼頭，就能前往工作室。</p>"
         ]
       }
     },
@@ -29,7 +29,7 @@
       "id": "demo_landmark",
       "npc_id": 2,
       "type": "static",
-      "npc_description": "【佔位】中島地標",
+      "npc_description": "島央地標",
       "map_offset_x": 34,
       "map_offset_y": 22,
       "offset_x": 0,
@@ -43,7 +43,7 @@
         "type": ["dialog"],
         "type_argument": [""],
         "html": [
-          "<p><strong>【佔位】</strong>中島地標。點一下關閉。島嶼入口進工作室尚未串接。</p>"
+          "<p>島中央這一帶視野開闊，常是認識芎林島方位的起點。點一下即可關閉。</p>"
         ]
       }
     },
@@ -51,7 +51,7 @@
       "id": "demo_notice",
       "npc_id": 1,
       "type": "static",
-      "npc_description": "【佔位】告示",
+      "npc_description": "島上告示",
       "map_offset_x": 27,
       "map_offset_y": 26,
       "offset_x": 1,
@@ -65,8 +65,29 @@
         "type": ["page"],
         "type_argument": [""],
         "html": [
-          "<p><strong>【佔位告示】</strong>本圖 NPC 為本地 JSON。主線不再呼叫 script.google.com。</p>"
+          "<h2>島上告示</h2><p>歡迎沿路走走，認識芎林的人、事與物。想到工作室看看，請往島緣的碼頭。</p>"
         ]
+      }
+    },
+    {
+      "id": "studio_entrance",
+      "npc_id": 1,
+      "type": "static",
+      "npc_description": "工作室入口",
+      "map_offset_x": 33,
+      "map_offset_y": 37,
+      "offset_x": 0,
+      "offset_y": 0,
+      "path_end_x": 2,
+      "path_end_y": 2,
+      "range": 0,
+      "path": "fixed",
+      "event_type": 1,
+      "draw": false,
+      "dialog": {
+        "type": ["change_map"],
+        "type_argument": ["13"],
+        "html": ["<p>進入工作室。</p>"]
       }
     }
   ]

@@ -8,6 +8,14 @@
 </head>
 
 <style>
+	:root {
+		--vv-top: 0px;
+		--vv-right: 0px;
+		--vv-bottom: 0px;
+		--vv-left: 0px;
+		--vv-height: 100dvh;
+	}
+
 	html, body {
 		margin: 0;
 		padding: 0;
@@ -15,6 +23,10 @@
 		height: 100%;
 		overflow: hidden;
 		background: #000;
+		/* manipulation: pinch still works, double-tap zoom does not. */
+		touch-action: manipulation;
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
 	}
 
 	canvas {
@@ -49,64 +61,95 @@
 		}
 	}
 
-	.cssdialog {
-		/*border: 4px solid red;*/
-		/*background-color :white;*/
-		background-image:url( 'assets/talk.png' );
-		display:none;
-
-		padding: 0;
-		margin: auto;
-		display: block;
-		height: 26%;
-
-		margin-bottom: 10px;
+	/* Dialog and NPC pages share one viewport-sized box.
+	   Desktop caps stay 1000px / 900px; phones use the visible width
+	   instead of a fixed 900px panel that overflows portrait screens.
+	   top/bottom follow the visual viewport plus the device safe area
+	   so the box stays above the URL bar, toolbar, and home indicator. */
+	.cssdialog,
+	.csspage {
+		background-image: url('assets/talk.png');
+		box-sizing: border-box;
+		display: none;
 		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-	
-		max-width: 1000px;
-		
-		padding-left:30px;
-  		padding-right:30px; 
-		overflow:auto;
+		z-index: 5;
+		left: calc(var(--vv-left, 0px) + env(safe-area-inset-left, 0px));
+		right: calc(var(--vv-right, 0px) + env(safe-area-inset-right, 0px));
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 16px 30px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		touch-action: manipulation;
+		cursor: pointer;
+		-webkit-user-select: none;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		color: #222;
+		overflow-wrap: anywhere;
+	}
+
+	.cssdialog img,
+	.csspage img,
+	.cssdialog video,
+	.csspage video,
+	.cssdialog iframe,
+	.csspage iframe {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.cssdialog a,
+	.csspage a {
+		cursor: pointer;
+	}
+
+	.cssdialog {
+		top: auto;
+		bottom: calc(10px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
+		height: 26%;
+		height: 26svh;
+		max-height: calc(var(--vv-height, 100svh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--vv-top, 0px) - var(--vv-bottom, 0px) - 20px);
+		width: min(1000px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+		max-width: min(1000px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
 	}
 
 	.csspage {
-		/*border: 2px solid green;*/
-		/*background-color :white;*/
-		background-image:url( 'assets/talk.png' );
-		display:none;
+		top: calc(100px + env(safe-area-inset-top, 0px) + var(--vv-top, 0px));
+		bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
+		width: min(900px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+		max-width: min(900px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+	}
 
-		padding: 0;
-		margin: auto;
-		display: block;
-	
-		margin-top: 100px;
-		margin-bottom: 80px;
-			 
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		
-		width: 900px;
-		
-		
-		padding-left:30px;
-  		padding-right:30px; 
-		
-		  overflow:auto;
-		/*overflow-x:hidden;*/
+	@media (max-width: 600px) {
+		.cssdialog,
+		.csspage {
+			padding-left: 16px;
+			padding-right: 16px;
+			padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+			font-size: 18px;
+			line-height: 1.5;
+		}
+
+		.cssdialog {
+			height: 36%;
+			height: 36svh;
+			bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
+		}
+
+		.csspage {
+			top: calc(16px + env(safe-area-inset-top, 0px) + var(--vv-top, 0px));
+			bottom: calc(16px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom, 0px));
+		}
 	}
 
 	 
 </style>
 
-<body onload="OnLoad()" onresize="OnResize()">
+<body onload="OnLoad()" onresize="if (window.OnResize) OnResize()">
 	<canvas id="canvas" width="1024" height="768"></canvas>
 	<div class="cssdialog" id="dialog"></div>
 	<div class="csspage" id="page"> </div>

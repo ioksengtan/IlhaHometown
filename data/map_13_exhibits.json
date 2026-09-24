@@ -20,7 +20,7 @@
       "dialog": {
         "type": ["change_map"],
         "type_argument": ["1"],
-        "html": [""]
+        "html": ["<p>回到芎林島。</p>"]
       }
     },
     {
